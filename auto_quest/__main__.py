@@ -1,15 +1,11 @@
+from auto_quest import Character
+
 def main():
-    actors = [
-        {
-            'name': 'dummy1',
-            'health': 10,
-            'actions': []
-        }
-    ]
+    characters = [Character(name = 'dummy1', health = 10)]
     done = False
     while not done:
-        for actor in actors:
-            done = done or actors.act(actor, actors)
+        for character in characters:
+            done = done or character.act(characters)
 
 if __name__ == '__main__':
     main()
