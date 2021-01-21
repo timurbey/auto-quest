@@ -1,0 +1,1 @@
+from auto_quest.dummy.dummy_character import DummyCharacter
