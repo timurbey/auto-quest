@@ -1,11 +1,18 @@
+from random import choice
+
 from auto_quest import Character
-
-def dummy_policy(user, characters):
-    return 0, characters[0]
-
-def attack(user, target):
-    target.health = target.health - 1
+from auto_quest import CharacterStats
 
 class DummyCharacter(Character):
-    def __init__(self, name, health = 0, actions = None, policy = None):
-        super().__init__(name, health, [attack], dummy_policy)
+    counter = 0
+
+    def __init__(self, health, speed, affiliation):
+        super().__init__(
+            id = {
+                  'id': DummyCharacter.counter,
+                  'name': 'dummy-' + str(DummyCharacter.counter)
+            },
+            stats = CharacterStats(health = health, speed = speed),
+            affiliation = affiliation
+        )
+        DummyCharacter.counter += 1

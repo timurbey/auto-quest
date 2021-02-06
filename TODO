@@ -1,0 +1,3 @@
+define game state
+add logging of game state
+define end condition
