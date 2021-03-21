@@ -1,29 +1,36 @@
-from random import random, choice
-
-from auto_quest import Character
-from auto_quest import CharacterStats
 from auto_quest.dummy import DummyCharacter
+from auto_quest.dummy.dummy_character import action_snapshot
 
 class DummyMage(DummyCharacter):
-    def __init__(self, affiliation):
-        super().__init__(
-            health = 50,
-            speed = 0,
-            affiliation = affiliation)
-        self.id['name'] = '-'.join(['mage', str(self.id['id'])])
+    counter = 0
 
-    def act(self, characters):
-        if random() > 0.25:
-            cmd = self.attack(choice([c for c in characters if c.affiliation != self.affiliation]))
+    def __init__(self):
+        super().__init__(
+            name = 'mage-' + str(DummyMage.counter + 1),
+            health = 50,
+            speed = 0
+        )
+        DummyMage.counter += 1
+
+    def act(self, characters, affiliation):
+        self.begin_turn()
+
+        if self != self.choose(characters):
+            cmd = self.fireball(characters)
         else:
-            cmd = self.fireball([c for c in characters if c.affiliation != self.affiliation])
+            target = self.choose(affiliation.enemies(self.id, characters))
+            cmd = self.attack(target)
+
+        self.end_turn()
         return [cmd, [character.snapshot() for character in characters]]
 
     def attack(self, target):
-        target.stats.damage(50)
-        return [self.attack, self, target]
+        self.threaten(1)
+        target.damage(20)
+        return action_snapshot("mage-attack", self, target)
 
     def fireball(self, targets):
+        self.threaten(5)
         for target in targets:
-            target.stats.damage(25)
-        return [self.fireball, self, targets]
+            target.damage(50)
+        return action_snapshot("mage-fireball", self, targets)

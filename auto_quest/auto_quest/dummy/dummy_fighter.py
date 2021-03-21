@@ -1,28 +1,35 @@
-from random import choice
-
-from auto_quest import Character
-from auto_quest import CharacterStats
 from auto_quest.dummy import DummyCharacter
+from auto_quest.dummy.dummy_character import action_snapshot
 
 class DummyFighter(DummyCharacter):
-    def __init__(self, affiliation):
-        super().__init__(
-            health = 100,
-            speed = 0,
-            affiliation = affiliation)
-        self.id['name'] = '-'.join(['fighter', str(self.id['id'])])
+    counter = 0
 
-    def act(self, characters):
-        if self.stats.armor == 0:
-            cmd = self.block()
+    def __init__(self):
+        super().__init__(
+            name = 'fighter-' + str(DummyFighter.counter + 1),
+            health = 100,
+            speed = 0
+        )
+        DummyFighter.counter += 1
+
+    def act(self, characters, affiliation):
+        self.begin_turn()
+
+        if self != self.choose(characters):
+            cmd = self.taunt()
         else:
-            cmd = self.attack(choice([c for c in characters if c.affiliation != self.affiliation]))
+            target = self.choose(affiliation.enemies(self.id, characters))
+            cmd = self.attack(target)
+
+        self.end_turn()
         return [cmd, [character.snapshot() for character in characters]]
 
     def attack(self, target):
-        target.stats.damage(25)
-        return [self.attack, self, target]
+        self.threaten(2)
+        target.damage(25)
+        return action_snapshot("fighter-attack", self, target)
 
-    def block(self):
-        self.stats.block(3)
-        return [self.block, self, self]
+    def taunt(self):
+        self.threaten(10)
+        self.block(10)
+        return action_snapshot("fighter-taunt", self, self)

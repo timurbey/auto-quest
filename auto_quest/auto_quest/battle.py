@@ -1,27 +1,24 @@
-class AutoBattle:
-    def __init__(self, characters):
+class Battle:
+    def __init__(self, characters, affiliation):
         self.characters = characters
+        self.affiliation = affiliation
 
     def run(self):
-        log = []
-        queued = self.characters.copy()
-        queued.sort(key = lambda c: c.stats.speed)
-        done = []
+        battle_log = []
         while not self.done():
-            if not queued:
-                queued = done
-                queued.sort(key = lambda c: c.stats.speed)
-                done = []
-            character = queued.pop()
-            log.append(character.act(self.characters))
-            done.append(character)
-        return log
+            self.characters = self.sort_characters()
+            for character in self.characters:
+                if character.status():
+                    battle_log.append(character.act(self.characters, self.affiliation))
+        return battle_log
 
+    # highest value wins sorting; i don't know how to resolve ties
+    def sort_characters(self):
+        return sorted(self.characters, key = lambda c: c.priority(), reverse = True)
+
+    # true if only one team has living characters; else return false
     def done(self):
-        affiliations = len({c.affiliation for c in self.characters})
-        alive = affiliations * [False]
+        alive = self.affiliation.count() * [False]
         for character in self.characters:
-            if character.stats.alive():
-                alive[character.affiliation] = True
-
+            alive[self.affiliation.of(character.id)] |= character.status()
         return sum(alive) < 2

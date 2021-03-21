@@ -1,25 +1,35 @@
-from random import choice
-
-from auto_quest import Character
-from auto_quest import CharacterStats
 from auto_quest.dummy import DummyCharacter
+from auto_quest.dummy.dummy_character import action_snapshot
 
 class DummyThief(DummyCharacter):
-    def __init__(self, affiliation):
-        super().__init__(
-            health = 75,
-            speed = 1,
-            affiliation = affiliation)
-        self.id['name'] = '-'.join(['thief', str(self.id['id'])])
+    counter = 0
 
-    def act(self, characters):
-        cmd = self.attack([
-            choice([c for c in characters if c.affiliation != self.affiliation]),
-            choice([c for c in characters if c.affiliation != self.affiliation])
-        ])
+    def __init__(self):
+        super().__init__(
+            name = 'thief-' + str(DummyThief.counter + 1),
+            health = 75,
+            speed = 0
+        )
+        DummyThief.counter += 1
+
+    def act(self, characters, affiliation):
+        self.begin_turn()
+
+        if self == self.choose(characters):
+            cmd = [self.vanish()]
+        else:
+            targets = [self.choose(affiliation.enemies(self.id, characters)) for _ in range(2)]
+            cmd = self.attack(targets)
+
+        self.end_turn()
         return [cmd, [character.snapshot() for character in characters]]
 
     def attack(self, targets):
+        self.threaten(3)
         for target in targets:
-            target.stats.damage(35)
-        return [self.attack, self, targets]
+            target.damage(20)
+        return action_snapshot("thief-attack", self, targets)
+
+    def vanish(self):
+        self.threaten(-10)
+        return action_snapshot("thief-vanish", self, self)

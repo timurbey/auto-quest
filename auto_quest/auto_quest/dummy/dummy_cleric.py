@@ -1,29 +1,35 @@
-from random import choice
-
-from auto_quest import Character
-from auto_quest import CharacterStats
 from auto_quest.dummy import DummyCharacter
+from auto_quest.dummy.dummy_character import action_snapshot
 
 class DummyCleric(DummyCharacter):
-    def __init__(self, affiliation):
-        super().__init__(
-            health = 75,
-            speed = 0,
-            affiliation = affiliation)
-        self.id['name'] = '-'.join(['cleric', str(self.id['id'])])
+        counter = 0
 
-    def act(self, characters):
-        targets = [c for c in characters if c.affiliation == self.affiliation and c.stats.health < 25]
-        if targets:
-            cmd = self.heal(min(targets, key = lambda c: c.stats.health))
-        else:
-            cmd = self.attack(choice([c for c in characters if c.affiliation != self.affiliation]))
-        return [cmd, [character.snapshot() for character in characters]]
+        def __init__(self):
+            super().__init__(
+                name = 'cleric-' + str(DummyCleric.counter + 1),
+                health = 75,
+                speed = 0
+            )
+            DummyCleric.counter += 1
 
-    def attack(self, target):
-        target.stats.damage(20)
-        return [self.attack, self, target]
+        def act(self, characters, affiliation):
+            self.begin_turn()
 
-    def heal(self, target):
-        target.stats.heal(25)
-        return [self.heal, self, target]
+            if self == self.choose(characters):
+                cmd = self.shield(affiliation.allies(self.id, characters))
+            else:
+                target = self.choose(affiliation.enemies(self.id, characters))
+                cmd = self.attack(target)
+
+            self.end_turn()
+            return [cmd, [character.snapshot() for character in characters]]
+
+        def attack(self, target):
+            self.threaten(1)
+            target.damage(20)
+            return action_snapshot("cleric-attack", self, target)
+
+        def shield(self, targets):
+            for target in targets:
+                target.block(25)
+            return action_snapshot("cleric-shield", self, targets)
