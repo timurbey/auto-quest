@@ -1,17 +1,14 @@
 from random import choice
 
-from auto_quest import Affiliation, Battle
-from auto_quest.dummy import DummyCleric
-from auto_quest.dummy import DummyFighter
-from auto_quest.dummy import DummyMage
-from auto_quest.dummy import DummyThief
+from auto_quest.dummy import Affiliation, Battle
+from auto_quest.dummy import Cleric, Fighter, Mage, Thief
 
-DUMMY_PARTY_CHOICES = [DummyCleric, DummyFighter, DummyThief, DummyMage]
+DUMMY_PARTY_CHOICES = [Cleric, Fighter, Mage, Thief]
 
 def dummy_party(count = 10):
     return [choice(DUMMY_PARTY_CHOICES)() for _ in range(count)]
 
-def battle_royal(teams):
+def setup_battle(teams):
     team_ids = range(len(teams))
     try:
         team_ids = {c.id: i for team, i in zip(teams, team_ids) for c in team}
@@ -24,9 +21,9 @@ def battle_royal(teams):
 
 def dummy_battle(team_size, team_count = None, rounds = 1):
     if team_count is None:
-        aff, battle_log = battle_royal(dummy_party(team_size))
+        aff, battle_log = setup_battle(dummy_party(team_size))
     else:
-        aff, battle_log = battle_royal([dummy_party(team_size) for _ in range(team_count)])
+        aff, battle_log = setup_battle([dummy_party(team_size) for _ in range(team_count)])
 
     battle_end = battle_log[-1][-1]
     for c in battle_end:

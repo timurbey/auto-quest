@@ -1,27 +1,17 @@
-from auto_quest.dummy import dummy_battle
+from argparse import ArgumentParser
+from auto_quest.dummy import run_dummy_tournament
 
-def print_summary(turns, winners):
-    print('battle length: ' + str(turns) + ' turns')
-    print('winning team:')
-    print(winners)
-
-def ffa(character_count = 10, rounds = 1):
-    for i in range(rounds):
-        print('round ' + str(i + 1) + ':')
-        print_summary(*dummy_battle(character_count))
-
-def team_fight(character_count = 10, team_count = 2, rounds = 1):
-    if character_count % team_count != 0:
-        raise Exception(str(character_count) + ' characters not divisible into ' + str(team_count) + ' teams')
-
-    team_size = character_count // team_count
-    for i in range(rounds):
-        print('round ' + str(i + 1) + ':')
-        print_summary(*dummy_battle(team_size, team_count))
+def parse_args():
+    parser = ArgumentParser()
+    parser.add_argument('--dummy', action='store_true')
+    return parser.parse_args()
 
 def main():
-    ffa(50, rounds = 10)
-    team_fight(12, 3, rounds = 10)
+    args = parse_args()
+
+    # TODO(timur): add hooks for custom logic
+    if args.dummy:
+        run_dummy_tournament()
 
 if __name__ == '__main__':
     main()

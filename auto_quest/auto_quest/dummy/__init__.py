@@ -1,8 +1,10 @@
-from auto_quest.dummy.dummy_character import DummyCharacter
+from auto_quest.dummy.character import Character
+from auto_quest.dummy.battle import Affiliation, Battle
 
-from auto_quest.dummy.dummy_cleric import DummyCleric
-from auto_quest.dummy.dummy_fighter import DummyFighter
-from auto_quest.dummy.dummy_mage import DummyMage
-from auto_quest.dummy.dummy_thief import DummyThief
+from auto_quest.dummy.cleric import Cleric
+from auto_quest.dummy.fighter import Fighter
+from auto_quest.dummy.mage import Mage
+from auto_quest.dummy.thief import Thief
 
-from auto_quest.dummy.dummy_battle import dummy_battle, dummy_party
+from auto_quest.dummy.dummy_battle import dummy_battle
+from auto_quest.dummy.tournament import run_dummy_tournament
