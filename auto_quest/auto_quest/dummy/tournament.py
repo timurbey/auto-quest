@@ -1,5 +1,6 @@
 from auto_quest.dummy import dummy_battle
 
+# TODO(timur): this is not very informative currently
 def print_summary(turns, winners):
     print('battle length: ' + str(turns) + ' turns')
     print('winning team:')

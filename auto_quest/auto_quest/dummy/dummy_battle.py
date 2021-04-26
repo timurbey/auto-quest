@@ -19,6 +19,7 @@ def setup_battle(teams):
     battle = Battle(teams, aff)
     return aff, battle.run()
 
+# TODO(timur): this only reports winners
 def dummy_battle(team_size, team_count = None, rounds = 1):
     if team_count is None:
         aff, battle_log = setup_battle(dummy_party(team_size))

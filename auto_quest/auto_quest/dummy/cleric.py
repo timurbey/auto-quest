@@ -1,6 +1,6 @@
 from auto_quest.dummy import Character
 
-# character that heal its team if it's a threat; has a medium attack
+# character that shields its team if it's a threat; has a medium attack
 class Cleric(Character):
     counter = 0
 
@@ -17,11 +17,11 @@ class Cleric(Character):
         target = self.choose(affiliation.enemies(self.id, characters))
 
         self.threat += 1
-        target.health -= 25
+        target.damage(25)
         return target
 
     def on_threat(self, characters, affiliation):
         targets = affiliation.allies(self.id, characters)
         for target in targets:
-            target.health += 20
+            target.armor += 20
         return targets

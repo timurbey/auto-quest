@@ -1,6 +1,6 @@
 from random import shuffle
 
-# helper class that makes it easy to search for affiliations
+# class that makes it easy to search for affiliations
 class Affiliation:
     def __init__(self, affiliation):
         self.affiliation = affiliation
@@ -12,10 +12,10 @@ class Affiliation:
         return self.affiliation[id]
 
     def allies(self, id, characters):
-        return [c for c in characters if self.affiliation[id] == self.affiliation[c.id]]
+        return [c for c in characters if self.affiliation[id] == self.affiliation[c.id] and c.health > 0]
 
     def enemies(self, id, characters):
-        return [c for c in characters if self.affiliation[id] != self.affiliation[c.id]]
+        return [c for c in characters if self.affiliation[id] != self.affiliation[c.id] and c.health > 0]
 
 # class that manages character turns and checks for a winning team
 class Battle:
@@ -26,18 +26,19 @@ class Battle:
     def run(self):
         battle_log = []
         turns = 0
-        # runs until done or for 10000 turns
-        while not self.done() and turns < 10000:
+        while not self.done():
             shuffle(self.characters)
-            for character in self.characters:
-                if character.status:
-                    battle_log.append(character.act(self.characters, self.affiliation))
+            for c in self.characters:
+                if self.done():
+                    break
+                if c.health > 0:
+                    battle_log.append(c.act(self.characters, self.affiliation))
                     turns += 1
         return battle_log
 
     # return true if only one team has living members
     def done(self):
         alive = self.affiliation.count() * [False]
-        for character in self.characters:
-            alive[self.affiliation.of(character.id)] |= character.status
+        for c in self.characters:
+            alive[self.affiliation.of(c.id)] |= c.health > 0
         return sum(alive) < 2

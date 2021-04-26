@@ -1,3 +1,4 @@
+from enum import Enum
 from random import randint
 
 # creates a snapshot that contains an action name, user, and target(s).
@@ -19,6 +20,18 @@ def choose_character(characters):
         else:
             threat += character.threat
 
+def evaluate_character(is_self):
+    if is_self:
+        return State.THREAT
+    else:
+        return State.NORMAL
+
+class State(Enum):
+    DEAD = 0
+    NORMAL = 1
+    THREAT = 2
+    DANGER = 3
+
 # prototype class for characters with hooks for the logic and actions
 class Character:
     counter = 0
@@ -26,6 +39,7 @@ class Character:
     def __init__(self, name = None, health = 1, choice_func = None, eval_func = None):
         # set up character
         self._health = health
+        self._armor = 0
         self._threat = 1
 
         # set up logic
@@ -35,13 +49,13 @@ class Character:
             self.choose = choice_func
 
         if eval_func is None:
-            self.evaluate = lambda c: self == self.choose(c)
+            self.evaluate = lambda c: evaluate_character(self == self.choose(c))
         else:
             self.evaluate = eval_func
 
-        self._id = Character.counter
+        self.id = Character.counter
         if name is None:
-            name = str(self._id)
+            name = str(self.id)
         else:
             self.name = name
         Character.counter += 1
@@ -49,55 +63,59 @@ class Character:
     def __str__(self):
         return str(self.snapshot())
 
-    @property
-    def id(self):
-        return self._id
-
-    @property
-    def status(self):
-        return self._health > 0
-
     def snapshot(self):
         return {
             'system': 'dummy',
-            'id'    : self._id,
+            'id'    : self.id,
             'name'  : self.name,
             'class' : self.__class__.__name__,
             'health': self.health,
+            'armor' : self.armor,
             'threat': self.threat,
         }
 
-    # accessors for health and threat
     @property
     def health(self):
         return self._health
 
+    def damage(self, value):
+        excess = value - self._armor
+        if excess > 0:
+            self._armor = 0
+            self._health = max(0, self._health - excess)
+        else:
+            self._armor = self._armor - value
+
+    @property
+    def armor(self):
+        return self._armor
+
+    @armor.setter
+    def armor(self, value):
+        self._armor = max(0, value)
+
     @property
     def threat(self):
         return self._threat
-
-    @health.setter
-    def health(self, value):
-        self._health = max(0, value)
 
     @threat.setter
     def threat(self, value):
         self._threat = max(1, value)
 
     def act(self, characters, affiliation):
-        self.threat = max(self.threat // 2, 1)
+        self.threat = self.threat // 2
+        self.armor = 0
 
-        if self.evaluate(characters):
-            cmd = action_snapshot(
-                self.__class__.__name__ + "-on_threat",
-                self,
-                self.on_threat(characters, affiliation)
-            )
-        else:
-            cmd = action_snapshot(
-                self.__class__.__name__ + "-on_no_threat",
-                self,
-                self.on_no_threat(characters, affiliation)
-            )
+        # TODO(timur): add more states
+        state = self.evaluate(characters)
+        if state is State.THREAT:
+            action = self.on_threat(characters, affiliation)
+        elif state is State.NORMAL:
+            action = self.on_no_threat(characters, affiliation)
+        cmd = action_snapshot(
+            self.__class__.__name__ + "@" + str(state),
+            self,
+            action
+        )
 
         return [cmd, [character.snapshot() for character in characters]]

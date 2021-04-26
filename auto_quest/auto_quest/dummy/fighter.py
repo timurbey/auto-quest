@@ -15,11 +15,12 @@ class Fighter(Character):
 
     def on_no_threat(self, characters, affiliation):
         self.threat += 5
+        self.armor += 30
         return self
 
     def on_threat(self, characters, affiliation):
         target = self.choose(affiliation.enemies(self.id, characters))
 
         self.threat += 2
-        target.health -= 30
+        target.damage(30)
         return target

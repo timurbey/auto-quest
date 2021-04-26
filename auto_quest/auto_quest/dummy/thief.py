@@ -20,7 +20,7 @@ class Thief(Character):
 
         self.threat += 3
         for target in targets:
-            target.health -= 25
+            target.damage(25)
         return targets
 
     def on_threat(self, characters, affiliation):

@@ -4,7 +4,7 @@ Simple combat system
 
 ## overview
 
-The `dummy` system uses a simple character called a `DummyCharacter`. `DummyCharacters` have a health and threat value. When a character's health reaches 0, they are dead and cannot act or be targeted.
+The `dummy` system uses a simple character called a `DummyCharacter`. `DummyCharacters` have a health, armor, and threat value. When a character's health reaches 0, they are dead and cannot act or be targeted.
 
 `DummyCharacters` make decisions based on a choice function and an evaluation function.
 
@@ -15,6 +15,6 @@ The evaluation function returns true if the character is threatened, making the 
 ## TODO
 
  - expand states
+ - write better hooks
  - implement more classes
- - write protobuf/numpy/pandas hooks
  - improve "tournament" system
