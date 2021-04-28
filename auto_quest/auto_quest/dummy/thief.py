@@ -1,4 +1,5 @@
 from auto_quest.dummy import Character
+from auto_quest.dummy.actions import medium_attack, weak_attack
 
 # character that hides if it's the threat; has a double medium attack
 class Thief(Character):
@@ -13,16 +14,20 @@ class Thief(Character):
         )
         Thief.counter += 1
 
-    def on_no_threat(self, characters, affiliation):
-        targets = [
-            self.choose(affiliation.enemies(self.id, characters)) for _ in range(2)
-        ]
-
-        self.threat += 3
-        for target in targets:
-            target.damage(25)
-        return targets
-
-    def on_threat(self, characters, affiliation):
+    def on_danger(self, characters, affiliation):
         self.threat -= 10
         return self
+
+    def on_threat(self, characters, affiliation):
+        target = self.choose(affiliation.enemies(self.id, characters))
+        medium_attack(self, target)
+        return target
+
+    def on_normal(self, characters, affiliation):
+        targets = []
+        targets.append(self.choose(affiliation.enemies(self.id, characters)))
+        medium_attack(self, targets[-1])
+        if len(affiliation.enemies(self.id, characters)) > 0:
+            targets.append(self.choose(affiliation.enemies(self.id, characters)))
+            weak_attack(self, targets[-1])
+        return targets

@@ -20,15 +20,8 @@ def setup_battle(teams):
     return aff, battle.run()
 
 # TODO(timur): this only reports winners
-def dummy_battle(team_size, team_count = None, rounds = 1):
+def dummy_battle(team_size, team_count = None):
     if team_count is None:
-        aff, battle_log = setup_battle(dummy_party(team_size))
+        return setup_battle(dummy_party(team_size))
     else:
-        aff, battle_log = setup_battle([dummy_party(team_size) for _ in range(team_count)])
-
-    battle_end = battle_log[-1][-1]
-    for c in battle_end:
-        if c['health'] > 0:
-            winners = aff.of(c['id'])
-            break
-    return len(battle_log), [(c['id'], c['name'], c['class']) for c in battle_end if aff.of(c['id']) == winners]
+        return setup_battle([dummy_party(team_size) for _ in range(team_count)])

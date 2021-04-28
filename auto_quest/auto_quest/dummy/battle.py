@@ -24,17 +24,15 @@ class Battle:
         self.affiliation = affiliation
 
     def run(self):
-        battle_log = []
-        turns = 0
+        turns = []
         while not self.done():
             shuffle(self.characters)
             for c in self.characters:
                 if self.done():
                     break
                 if c.health > 0:
-                    battle_log.append(c.act(self.characters, self.affiliation))
-                    turns += 1
-        return battle_log
+                    turns.append(c.act(self.characters, self.affiliation))
+        return turns
 
     # return true if only one team has living members
     def done(self):

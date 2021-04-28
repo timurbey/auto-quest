@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import auto, Enum
 from random import randint
 
 # creates a snapshot that contains an action name, user, and target(s).
@@ -20,17 +20,21 @@ def choose_character(characters):
         else:
             threat += character.threat
 
-def evaluate_character(is_self):
-    if is_self:
-        return State.THREAT
+# if we were chosen, we are THREAT; otherwise we are NORMAL
+def evaluate_character(eval_character, chosen_character):
+    if eval_character.id == chosen_character.id:
+        if eval_character.health < 30:
+            return State.DANGER
+        else:
+            return State.THREAT
     else:
         return State.NORMAL
 
+# states characters can be in from the eval function
 class State(Enum):
-    DEAD = 0
-    NORMAL = 1
-    THREAT = 2
-    DANGER = 3
+    DANGER = auto()
+    THREAT = auto()
+    NORMAL = auto()
 
 # prototype class for characters with hooks for the logic and actions
 class Character:
@@ -49,7 +53,7 @@ class Character:
             self.choose = choice_func
 
         if eval_func is None:
-            self.evaluate = lambda c: evaluate_character(self == self.choose(c))
+            self.evaluate = lambda c: evaluate_character(self, self.choose(c))
         else:
             self.evaluate = eval_func
 
@@ -108,10 +112,14 @@ class Character:
 
         # TODO(timur): add more states
         state = self.evaluate(characters)
-        if state is State.THREAT:
+        if state is State.DANGER:
+            action = self.on_danger(characters, affiliation)
+        elif state is State.THREAT:
             action = self.on_threat(characters, affiliation)
         elif state is State.NORMAL:
-            action = self.on_no_threat(characters, affiliation)
+            action = self.on_normal(characters, affiliation)
+        else:
+            raise Exception('got undefined state: ' + str(state))
         cmd = action_snapshot(
             self.__class__.__name__ + "@" + str(state),
             self,

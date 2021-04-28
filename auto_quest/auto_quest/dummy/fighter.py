@@ -1,4 +1,5 @@
 from auto_quest.dummy import Character
+from auto_quest.dummy.actions import medium_attack, strong_attack
 
 # character that taunts if they aren't the threat; has a strong attack
 class Fighter(Character):
@@ -13,14 +14,17 @@ class Fighter(Character):
         )
         Fighter.counter += 1
 
-    def on_no_threat(self, characters, affiliation):
-        self.threat += 5
-        self.armor += 30
-        return self
+    def on_danger(self, characters, affiliation):
+        target = self.choose(affiliation.enemies(self.id, characters))
+        strong_attack(self, target)
+        return target
 
     def on_threat(self, characters, affiliation):
         target = self.choose(affiliation.enemies(self.id, characters))
-
-        self.threat += 2
-        target.damage(30)
+        medium_attack(self, target)
         return target
+
+    def on_normal(self, characters, affiliation):
+        self.threat += 5
+        self.armor += 30
+        return self
