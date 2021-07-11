@@ -43,11 +43,15 @@ class Character:
     @property
     def actions(self):
         return [
-            self.equipment[ItemType.WEAPON].effects,
-            self.equipment[ItemType.TOOL].effects,
-            self.equipment[ItemType.TRINKET][0].effects,
-            self.equipment[ItemType.TRINKET][1].effects,
+            self.equipment[ItemType.WEAPON].effect,
+            self.equipment[ItemType.TOOL].effect,
+            self.equipment[ItemType.TRINKET][0].effect,
+            self.equipment[ItemType.TRINKET][1].effect,
         ]
+
+    @property
+    def max_health(self):
+        return self.character_class['max_health']
 
     def equip(self, item):
         if item.type == ItemType.TRINKET:

@@ -1,15 +1,14 @@
 from enum import auto, Enum
-from random import randint
 
 class Item:
-    def __init__(self, id, type, effects, name = None):
+    def __init__(self, id, type, effect, name = None):
         # identifiers
         self.id = id
         self.name = name
 
         # item model
         self.type = type
-        self.effects = effects
+        self.effect = effect
 
     def __str__(self):
         return str(self.snapshot())
@@ -19,7 +18,7 @@ class Item:
             'id'      : self.id,
             'name'    : self.name,
             'type'    : self.type,
-            'effects' : self.effects,
+            'effect' : self.effect,
         }
 
 class ItemType(Enum):
