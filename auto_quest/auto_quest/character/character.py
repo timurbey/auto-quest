@@ -1,4 +1,4 @@
-from auto_quest.item import ItemType
+from auto_quest.character.item import ItemType
 
 class Character:
     def __init__(self, id, character_class, logic, name = None):
@@ -48,10 +48,6 @@ class Character:
             self.equipment[ItemType.TRINKET][0].effect,
             self.equipment[ItemType.TRINKET][1].effect,
         ]
-
-    @property
-    def max_health(self):
-        return self.character_class['max_health']
 
     def equip(self, item):
         if item.type == ItemType.TRINKET:
